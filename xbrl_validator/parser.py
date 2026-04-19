@@ -145,9 +145,12 @@ def _parse_context(context: ET.Element) -> ContextData:
     identifier = _first_child(entity, XBRLI_NS, "identifier") if entity is not None else None
 
     period = _first_child(context, XBRLI_NS, "period")
-    instant = _first_child(period, XBRLI_NS, "instant").text.strip() if period is not None and _first_child(period, XBRLI_NS, "instant") is not None and _first_child(period, XBRLI_NS, "instant").text else None
-    start_date = _first_child(period, XBRLI_NS, "startDate").text.strip() if period is not None and _first_child(period, XBRLI_NS, "startDate") is not None and _first_child(period, XBRLI_NS, "startDate").text else None
-    end_date = _first_child(period, XBRLI_NS, "endDate").text.strip() if period is not None and _first_child(period, XBRLI_NS, "endDate") is not None and _first_child(period, XBRLI_NS, "endDate").text else None
+    instant_element = _first_child(period, XBRLI_NS, "instant") if period is not None else None
+    start_element = _first_child(period, XBRLI_NS, "startDate") if period is not None else None
+    end_element = _first_child(period, XBRLI_NS, "endDate") if period is not None else None
+    instant = instant_element.text.strip() if instant_element is not None and instant_element.text else None
+    start_date = start_element.text.strip() if start_element is not None and start_element.text else None
+    end_date = end_element.text.strip() if end_element is not None and end_element.text else None
 
     period_type = "instant" if instant else "duration" if start_date and end_date else None
 
@@ -225,7 +228,7 @@ def _parse_tuple(element: ET.Element, namespaces: Dict[str, str]) -> TupleData:
     for child in list(element):
         if _is_infrastructure(child):
             continue
-        if list(child):
+        if len(child):
             tuples.append(_parse_tuple(child, namespaces))
         else:
             facts.append(_parse_fact(child, namespaces))
@@ -304,7 +307,7 @@ def parse_xbrl_instance(xml_content: str) -> XBRLInstanceData:
         elif (uri, local) == (LINK_NS, "footnoteLink"):
             footnote_links.append(_parse_footnote_link(child))
         else:
-            if list(child):
+            if len(child):
                 tuples.append(_parse_tuple(child, namespaces))
             else:
                 facts.append(_parse_fact(child, namespaces))
