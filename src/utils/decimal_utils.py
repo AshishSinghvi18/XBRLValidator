@@ -68,8 +68,8 @@ def decimal_to_str(value: Decimal) -> str:
     Returns:
         Plain decimal string (e.g. ``"1234.5600"``).
     """
-    # normalize removes trailing zeros; we use to_eng_string for
-    # readability but fall back to format for very large exponents.
+    # Use 'f' format to produce a plain decimal string without
+    # scientific notation, preserving the reported precision.
     if value.is_zero():
         return "0"
     # Use 'f' format specifier to avoid scientific notation.

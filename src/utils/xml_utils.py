@@ -12,18 +12,17 @@ from typing import IO
 
 from lxml import etree
 
-from src.core.constants import DEFAULT_MAX_ENTITY_EXPANSIONS
 from src.core.exceptions import XMLParseError, XXEError
 
 
 def _hardened_parser(
     *,
     huge_tree: bool = False,
-    max_entity_expansions: int = DEFAULT_MAX_ENTITY_EXPANSIONS,
 ) -> etree.XMLParser:
     """Create an lxml ``XMLParser`` with all dangerous features disabled.
 
-    Spec: Rule 3 — Zero-Trust Parsing.
+    Spec: Rule 3 — Zero-Trust Parsing.  Entity resolution is fully
+    disabled via ``resolve_entities=False``.
     """
     parser = etree.XMLParser(
         resolve_entities=False,
@@ -33,8 +32,6 @@ def _hardened_parser(
         huge_tree=huge_tree,
         recover=False,
     )
-    # lxml 4.9+: set_element_class_lookup is not needed for security.
-    # Entity expansion is bounded by resolve_entities=False.
     return parser
 
 
