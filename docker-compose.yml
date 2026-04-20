@@ -1,0 +1,49 @@
+version: "3.9"
+services:
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=postgresql+asyncpg://xbrl:xbrl@postgres:5432/xbrl
+    volumes:
+      - taxonomy_cache:/app/.tax_cache
+    depends_on:
+      - redis
+      - postgres
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    deploy:
+      replicas: 4
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=postgresql+asyncpg://xbrl:xbrl@postgres:5432/xbrl
+    volumes:
+      - taxonomy_cache:/app/.tax_cache
+    depends_on:
+      - redis
+      - postgres
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: xbrl
+      POSTGRES_PASSWORD: xbrl
+      POSTGRES_DB: xbrl
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  taxonomy_cache:
+  pgdata:
