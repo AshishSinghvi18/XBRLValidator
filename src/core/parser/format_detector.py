@@ -56,8 +56,7 @@ _LINKBASE_RE: re.Pattern[bytes] = re.compile(
     rb"<(?:\w+:)?linkbase[\s>]", re.IGNORECASE,
 )
 _ROOT_TAG_RE: re.Pattern[bytes] = re.compile(
-    rb"<(?:\?xml[^?]*\?>\s*)?(?:<!--.*?-->\s*)*<([a-zA-Z_][\w.-]*(?::[a-zA-Z_][\w.-]*)?)",
-    re.DOTALL,
+    rb"<([a-zA-Z_][\w.-]*(?::[a-zA-Z_][\w.-]*)?)",
 )
 _NS_DECL_RE: re.Pattern[bytes] = re.compile(
     rb'xmlns(?::(\w+))?=["\']([^"\']+)["\']',
@@ -192,7 +191,12 @@ class FormatDetector:
 
     def _detect_root_qname(self, header: bytes) -> QName:
         """Detect the root element QName from the header."""
-        m = _ROOT_TAG_RE.search(header)
+        # Strip XML declaration and comments before finding the first element
+        stripped = header
+        stripped = re.sub(rb"<\?xml[^?]*\?>", b"", stripped, count=1)
+        stripped = re.sub(rb"<!--[\s\S]*?-->", b"", stripped)
+        stripped = stripped.lstrip()
+        m = _ROOT_TAG_RE.search(stripped)
         if m:
             tag = m.group(1).decode("utf-8", errors="replace")
             return tag
