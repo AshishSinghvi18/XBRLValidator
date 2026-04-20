@@ -1,0 +1,54 @@
+# ── Stage 1: Builder ────────────────────────────────────────────────────────────
+FROM python:3.12-slim AS builder
+
+WORKDIR /build
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gcc libxml2-dev libxslt1-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY pyproject.toml README.md LICENSE ./
+COPY src/ src/
+
+RUN pip install --no-cache-dir --prefix=/install .
+
+# ── Stage 2: Runtime ───────────────────────────────────────────────────────────
+FROM python:3.12-slim AS runtime
+
+LABEL maintainer="XBRLValidator Team"
+LABEL description="XBRL/iXBRL Validator Engine — Celery Worker"
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libxml2 libxslt1.1 && \
+    rm -rf /var/lib/apt/lists/* && \
+    groupadd --gid 1000 xbrl && \
+    useradd --uid 1000 --gid xbrl --shell /bin/bash --create-home xbrl
+
+COPY --from=builder /install /usr/local
+
+WORKDIR /app
+COPY src/ src/
+
+RUN mkdir -p /home/xbrl/.xbrl-validator/cache && \
+    chown -R xbrl:xbrl /app /home/xbrl/.xbrl-validator
+
+USER xbrl
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    XBRL_ENV=production \
+    XBRL_LOG_LEVEL=INFO \
+    XBRL_LOG_FORMAT=json \
+    XBRL_WORKER_CONCURRENCY=4 \
+    XBRL_WORKER_MAX_TASKS_PER_CHILD=100
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+    CMD celery -A src.api.worker inspect ping --timeout=5 || exit 1
+
+CMD ["celery", "-A", "src.api.worker", "worker", \
+     "--loglevel=info", \
+     "--concurrency=4", \
+     "--max-tasks-per-child=100", \
+     "--prefetch-multiplier=1", \
+     "--without-heartbeat", \
+     "--without-mingle"]

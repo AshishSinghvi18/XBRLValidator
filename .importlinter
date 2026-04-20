@@ -1,0 +1,19 @@
+[importlinter]
+root_packages = src
+
+[importlinter:contract:core-no-regulator]
+name = Core must not import from regulator
+type = forbidden
+source_modules =
+  src.core
+  src.validator.spec
+forbidden_modules =
+  src.validator.regulator
+
+[importlinter:contract:spec-no-regulator]
+name = Spec validators must not import from regulator
+type = forbidden
+source_modules =
+  src.validator.spec
+forbidden_modules =
+  src.validator.regulator

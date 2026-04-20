@@ -1,0 +1,100 @@
+services:
+  # ── API Server ──────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      XBRL_ENV: production
+      XBRL_LOG_LEVEL: INFO
+      XBRL_LOG_FORMAT: json
+      XBRL_DATABASE_URL: postgresql+asyncpg://xbrl:xbrl@postgres:5432/xbrl_validator
+      XBRL_REDIS_URL: redis://redis:6379/0
+      XBRL_TAXONOMY_CACHE_DIR: /data/taxonomy-cache
+      XBRL_OTEL_ENABLED: "false"
+    volumes:
+      - taxonomy-cache:/data/taxonomy-cache
+      - upload-data:/data/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # ── Celery Worker ───────────────────────────────────────────────────────────
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    environment:
+      XBRL_ENV: production
+      XBRL_LOG_LEVEL: INFO
+      XBRL_LOG_FORMAT: json
+      XBRL_DATABASE_URL: postgresql+asyncpg://xbrl:xbrl@postgres:5432/xbrl_validator
+      XBRL_REDIS_URL: redis://redis:6379/0
+      XBRL_TAXONOMY_CACHE_DIR: /data/taxonomy-cache
+      XBRL_WORKER_CONCURRENCY: "4"
+      XBRL_WORKER_MAX_TASKS_PER_CHILD: "100"
+    volumes:
+      - taxonomy-cache:/data/taxonomy-cache
+      - upload-data:/data/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: xbrl
+      POSTGRES_PASSWORD: xbrl
+      POSTGRES_DB: xbrl_validator
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U xbrl -d xbrl_validator"]
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+      retries: 5
+    restart: unless-stopped
+
+  # ── Redis ───────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: >
+      redis-server
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --appendonly yes
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      start_period: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  redis-data:
+  taxonomy-cache:
+  upload-data:
