@@ -1,0 +1,23 @@
+validation:
+  large_file_threshold_mb: 100
+  memory_budget_mb: 4096
+  max_file_size_mb: 10240
+  fact_index_spill_threshold: 10000000
+  error_buffer_limit: 10000
+  io_chunk_size_mb: 64
+  sax_buffer_size_mb: 8
+  taxonomy_fetch_timeout_s: 30
+  max_entity_expansions: 100
+
+taxonomy:
+  cache_dir: .tax_cache
+  remote_timeout_s: 30
+
+output:
+  default_format: json
+  include_fix_suggestions: true
+  include_ai: false
+
+logging:
+  level: INFO
+  structured: true

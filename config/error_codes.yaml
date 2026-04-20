@@ -1,0 +1,1185 @@
+# =============================================================================
+# XBRL Validator – Error Code Registry
+#
+# Every validation finding is identified by a unique code in the format
+# CATEGORY-NNNN.  The registry below maps each code to its metadata:
+#
+#   severity : error | warning | inconsistency | info
+#   source   : subsystem that emits the finding
+#   spec     : specification section that defines the rule
+#   desc     : short human-readable description
+#   fix      : suggested remediation
+# =============================================================================
+
+# ---------------------------------------------------------------------------
+# PARSE – XML / document parsing errors
+# ---------------------------------------------------------------------------
+PARSE-0001:
+  severity: error
+  source: parser
+  spec: "XML 1.0"
+  desc: "Malformed XML"
+  fix: "Check XML well-formedness - ensure all tags are properly closed and nested"
+
+PARSE-0002:
+  severity: error
+  source: parser
+  spec: "XML 1.0 §4.2.2"
+  desc: "External entity detected (XXE)"
+  fix: "Remove external entity references from the document"
+
+PARSE-0003:
+  severity: error
+  source: parser
+  spec: "XML 1.0"
+  desc: "DTD bomb / entity expansion attack detected"
+  fix: "Remove recursive entity definitions from the document"
+
+PARSE-0004:
+  severity: error
+  source: parser
+  spec: "XML 1.0"
+  desc: "Invalid character encoding"
+  fix: "Ensure the document uses a supported encoding (UTF-8 recommended)"
+
+PARSE-0005:
+  severity: error
+  source: parser
+  spec: "XML Namespaces 1.0"
+  desc: "Namespace declaration error"
+  fix: "Verify all namespace prefixes are properly declared"
+
+PARSE-0006:
+  severity: error
+  source: parser
+  spec: "XBRL 2.1 §3"
+  desc: "File exceeds maximum allowed size"
+  fix: "Split the filing into smaller instance documents or increase the max file size configuration"
+
+PARSE-0007:
+  severity: error
+  source: parser
+  spec: "XBRL 2.1 §3"
+  desc: "Unsupported XBRL format"
+  fix: "Ensure the document is in a supported format (XBRL XML, iXBRL, xBRL-JSON, xBRL-CSV)"
+
+# ---------------------------------------------------------------------------
+# DTS – Discoverable Taxonomy Set resolution
+# ---------------------------------------------------------------------------
+DTS-0001:
+  severity: error
+  source: taxonomy
+  spec: "XBRL 2.1 §3.2"
+  desc: "Taxonomy schema not found"
+  fix: "Verify the schemaRef href points to a valid taxonomy schema URL or file"
+
+DTS-0002:
+  severity: error
+  source: taxonomy
+  spec: "XBRL 2.1 §3.5"
+  desc: "Linkbase reference cannot be resolved"
+  fix: "Check that the linkbaseRef href is correct and the linkbase file is accessible"
+
+DTS-0003:
+  severity: error
+  source: taxonomy
+  spec: "XBRL 2.1 §3.4"
+  desc: "Circular import detected in taxonomy"
+  fix: "Remove the circular schema import chain"
+
+DTS-0004:
+  severity: warning
+  source: taxonomy
+  spec: "XBRL 2.1 §3.5.3"
+  desc: "Duplicate linkbase reference"
+  fix: "Remove the duplicate linkbaseRef element"
+
+DTS-0005:
+  severity: error
+  source: taxonomy
+  spec: "XBRL 2.1 §3.2"
+  desc: "Taxonomy fetch timeout"
+  fix: "Check network connectivity or increase the taxonomy_fetch_timeout_s configuration"
+
+# ---------------------------------------------------------------------------
+# MODEL – XBRL data model construction
+# ---------------------------------------------------------------------------
+MODEL-0001:
+  severity: error
+  source: model
+  spec: "XBRL 2.1 §4"
+  desc: "Duplicate fact identifier"
+  fix: "Ensure all fact elements have unique id attributes within the instance"
+
+MODEL-0002:
+  severity: error
+  source: model
+  spec: "XBRL 2.1 §4.7"
+  desc: "Context references undefined context"
+  fix: "Add a context element with the referenced id to the instance document"
+
+MODEL-0003:
+  severity: error
+  source: model
+  spec: "XBRL 2.1 §4.8"
+  desc: "Unit references undefined unit"
+  fix: "Add a unit element with the referenced id to the instance document"
+
+MODEL-0004:
+  severity: error
+  source: model
+  spec: "XBRL 2.1 §4"
+  desc: "Fact references undefined concept in DTS"
+  fix: "Ensure the concept is declared in an imported taxonomy schema"
+
+MODEL-0005:
+  severity: warning
+  source: model
+  spec: "XBRL 2.1 §4"
+  desc: "Unused context or unit definition"
+  fix: "Remove context/unit elements that are not referenced by any fact"
+
+# ---------------------------------------------------------------------------
+# XBRL21 – XBRL 2.1 specification rules
+# ---------------------------------------------------------------------------
+XBRL21-0001:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §4.1"
+  desc: "Missing required xbrli:xbrl root element"
+  fix: "Ensure the root element is xbrli:xbrl with the correct namespace"
+
+XBRL21-0002:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §4.2"
+  desc: "Missing required schemaRef element"
+  fix: "Add at least one link:schemaRef element to the instance document"
+
+XBRL21-0003:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §4.7.1"
+  desc: "Invalid instant period"
+  fix: "Ensure the instant element contains a valid date value"
+
+XBRL21-0004:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §4.7.2"
+  desc: "Invalid duration period - start date must precede end date"
+  fix: "Ensure startDate is before endDate in the period element"
+
+XBRL21-0005:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §4.7"
+  desc: "Missing period element in context"
+  fix: "Add a period element to the context"
+
+XBRL21-0006:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §4.6"
+  desc: "Invalid entity identifier"
+  fix: "Ensure the entity identifier scheme and value are present and valid"
+
+XBRL21-0007:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §4.8"
+  desc: "Invalid unit - missing required measure"
+  fix: "Add at least one measure element to the unit"
+
+XBRL21-0008:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §4.8.2"
+  desc: "Invalid divide element in unit"
+  fix: "Ensure divide contains both unitNumerator and unitDenominator"
+
+XBRL21-0009:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §4.6.2"
+  desc: "Numeric fact missing unitRef"
+  fix: "Add a unitRef attribute to the numeric fact element"
+
+XBRL21-0010:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §4.6.3"
+  desc: "Non-numeric fact has unitRef"
+  fix: "Remove the unitRef attribute from the non-numeric fact element"
+
+XBRL21-0011:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §4.6.5"
+  desc: "Invalid precision/decimals specification"
+  fix: "Use either precision or decimals, not both; ensure the value is valid"
+
+XBRL21-0012:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §4.6.6"
+  desc: "Both precision and decimals specified on fact"
+  fix: "Remove either precision or decimals - only one may be specified"
+
+XBRL21-0013:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §4.6"
+  desc: "Fact value does not match concept data type"
+  fix: "Ensure the fact value conforms to the data type declared in the taxonomy"
+
+XBRL21-0014:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §4.7"
+  desc: "Duplicate context definition"
+  fix: "Remove duplicate context elements with equivalent content"
+
+XBRL21-0015:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §4.8"
+  desc: "Duplicate unit definition"
+  fix: "Remove duplicate unit elements with equivalent content"
+
+XBRL21-0016:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §4.9"
+  desc: "Invalid footnote link"
+  fix: "Ensure footnoteLink elements use the correct arcrole and XLink attributes"
+
+XBRL21-0017:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §5.2.5"
+  desc: "Concept not in abstract substitution group used as abstract"
+  fix: "Set the abstract attribute correctly in the taxonomy schema"
+
+XBRL21-0018:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §5.1"
+  desc: "Element declaration missing required attributes"
+  fix: "Add required attributes (name, type, substitutionGroup) to the element declaration"
+
+XBRL21-0019:
+  severity: warning
+  source: spec_validator
+  spec: "XBRL 2.1 §4.6.7"
+  desc: "Nil fact with non-empty content"
+  fix: "Remove content from the fact element or remove the xsi:nil attribute"
+
+XBRL21-0020:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §4.7.3"
+  desc: "Context segment contains invalid content"
+  fix: "Ensure context segment only contains valid elements"
+
+XBRL21-0021:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §4.7.4"
+  desc: "Context scenario contains invalid content"
+  fix: "Ensure context scenario only contains valid elements"
+
+XBRL21-0022:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §5.2.1"
+  desc: "Extended link with invalid content"
+  fix: "Ensure extended link elements only contain valid arc, locator, and resource elements"
+
+XBRL21-0023:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §5.2.3"
+  desc: "Arc with missing or invalid from/to locators"
+  fix: "Ensure arc from/to attributes reference valid locator labels"
+
+XBRL21-0024:
+  severity: error
+  source: spec_validator
+  spec: "XBRL 2.1 §5.2.4"
+  desc: "Locator with unresolvable href"
+  fix: "Ensure locator href points to a valid resource in the DTS"
+
+XBRL21-0025:
+  severity: warning
+  source: spec_validator
+  spec: "XBRL 2.1 §3.5.3"
+  desc: "Duplicate role or arcrole definition"
+  fix: "Remove the duplicate role/arcrole definition"
+
+# ---------------------------------------------------------------------------
+# CALC – Calculation linkbase validation
+# ---------------------------------------------------------------------------
+CALC-0001:
+  severity: inconsistency
+  source: calculation
+  spec: "XBRL 2.1 §5.2.5.2"
+  desc: "Calculation inconsistency - summation item total mismatch"
+  fix: "Review the reported facts and verify the values are correct"
+
+CALC-0002:
+  severity: warning
+  source: calculation
+  spec: "XBRL 2.1 §5.2.5.2"
+  desc: "Missing contributing item in calculation"
+  fix: "Report the missing contributing fact or verify it should be omitted"
+
+CALC-0003:
+  severity: error
+  source: calculation
+  spec: "XBRL 2.1 §5.2.5.2"
+  desc: "Invalid weight on calculation arc"
+  fix: "Ensure the calculation arc weight is a valid non-zero decimal value"
+
+CALC-0004:
+  severity: warning
+  source: calculation
+  spec: "XBRL 2.1 §5.2.5.2"
+  desc: "Calculation rollup rounding tolerance exceeded"
+  fix: "Review the rounding of contributing fact values"
+
+CALC-0005:
+  severity: warning
+  source: calculation
+  spec: "XBRL 2.1 §5.2.5.2"
+  desc: "Duplicate calculation relationships"
+  fix: "Remove duplicate calculation arcs between the same concepts"
+
+CALC-0006:
+  severity: error
+  source: calculation
+  spec: "XBRL 2.1 §5.2.5.2"
+  desc: "Circular calculation relationship detected"
+  fix: "Remove the circular dependency in the calculation linkbase"
+
+# ---------------------------------------------------------------------------
+# DIM – Dimensional (XBRL Dimensions 1.0) validation
+# ---------------------------------------------------------------------------
+DIM-0001:
+  severity: error
+  source: dimensions
+  spec: "XBRL Dimensions 1.0 §2.4"
+  desc: "Invalid explicit dimension member"
+  fix: "Ensure the dimension member is a valid domain member for the declared dimension"
+
+DIM-0002:
+  severity: error
+  source: dimensions
+  spec: "XBRL Dimensions 1.0 §2.5"
+  desc: "Invalid typed dimension value"
+  fix: "Ensure the typed dimension value conforms to the declared element type"
+
+DIM-0003:
+  severity: error
+  source: dimensions
+  spec: "XBRL Dimensions 1.0 §2.3"
+  desc: "Hypercube not valid for primary item"
+  fix: "Verify the primary item is associated with the correct hypercube via definition linkbase"
+
+DIM-0004:
+  severity: error
+  source: dimensions
+  spec: "XBRL Dimensions 1.0 §2.6"
+  desc: "Required dimension missing from context"
+  fix: "Add the required dimension member to the context segment or scenario"
+
+DIM-0005:
+  severity: error
+  source: dimensions
+  spec: "XBRL Dimensions 1.0 §2.6"
+  desc: "Unexpected dimension in context"
+  fix: "Remove the dimension that is not declared in the relevant hypercube"
+
+DIM-0006:
+  severity: error
+  source: dimensions
+  spec: "XBRL Dimensions 1.0 §2.4"
+  desc: "Default member explicitly reported"
+  fix: "Remove the default dimension member from the context - it is implied"
+
+DIM-0007:
+  severity: error
+  source: dimensions
+  spec: "XBRL Dimensions 1.0 §2.3"
+  desc: "Negative hypercube (notAll) violation"
+  fix: "Ensure the fact's dimensional context does not match an excluded hypercube"
+
+DIM-0008:
+  severity: error
+  source: dimensions
+  spec: "XBRL Dimensions 1.0 §2.3"
+  desc: "Duplicate hypercube-dimension relationship"
+  fix: "Remove the duplicate hypercube-dimension arc in the definition linkbase"
+
+DIM-0009:
+  severity: error
+  source: dimensions
+  spec: "XBRL Dimensions 1.0 §2.4"
+  desc: "Dimension domain not found"
+  fix: "Ensure the dimension-domain arc correctly references a valid domain element"
+
+DIM-0010:
+  severity: warning
+  source: dimensions
+  spec: "XBRL Dimensions 1.0 §2.4"
+  desc: "Dimension has no default member declared"
+  fix: "Consider adding a dimension-default arc for the dimension"
+
+# ---------------------------------------------------------------------------
+# IXBRL – Inline XBRL validation
+# ---------------------------------------------------------------------------
+IXBRL-0001:
+  severity: error
+  source: inline_xbrl
+  spec: "Inline XBRL 1.1 §4"
+  desc: "Missing required ix:header element"
+  fix: "Add an ix:header element containing references and resources"
+
+IXBRL-0002:
+  severity: error
+  source: inline_xbrl
+  spec: "Inline XBRL 1.1 §5"
+  desc: "Invalid ix:nonFraction element"
+  fix: "Ensure ix:nonFraction has required attributes (name, contextRef, unitRef, format)"
+
+IXBRL-0003:
+  severity: error
+  source: inline_xbrl
+  spec: "Inline XBRL 1.1 §6"
+  desc: "Invalid ix:nonNumeric element"
+  fix: "Ensure ix:nonNumeric has required attributes (name, contextRef)"
+
+IXBRL-0004:
+  severity: error
+  source: inline_xbrl
+  spec: "Inline XBRL 1.1 §7"
+  desc: "Transformation failure"
+  fix: "Check that the format attribute matches a valid transformation rule for the value"
+
+IXBRL-0005:
+  severity: error
+  source: inline_xbrl
+  spec: "Inline XBRL 1.1 §4.2"
+  desc: "Invalid ix:references element"
+  fix: "Ensure ix:references contains valid schemaRef elements"
+
+IXBRL-0006:
+  severity: error
+  source: inline_xbrl
+  spec: "Inline XBRL 1.1 §4.3"
+  desc: "Invalid ix:resources element"
+  fix: "Ensure ix:resources contains valid context and unit elements"
+
+IXBRL-0007:
+  severity: error
+  source: inline_xbrl
+  spec: "Inline XBRL 1.1 §5.1"
+  desc: "ix:fraction with invalid numerator or denominator"
+  fix: "Ensure ix:fraction contains valid ix:numerator and ix:denominator children"
+
+IXBRL-0008:
+  severity: error
+  source: inline_xbrl
+  spec: "Inline XBRL 1.1 §8"
+  desc: "Invalid ix:tuple element"
+  fix: "Ensure ix:tuple has a valid name attribute and well-formed child facts"
+
+IXBRL-0009:
+  severity: error
+  source: inline_xbrl
+  spec: "Inline XBRL 1.1 §9"
+  desc: "ix:continuation element with invalid target"
+  fix: "Ensure the continuationAt attribute references a valid ix:continuation id"
+
+IXBRL-0010:
+  severity: error
+  source: inline_xbrl
+  spec: "Inline XBRL 1.1 §10"
+  desc: "ix:exclude element in invalid position"
+  fix: "Ensure ix:exclude is only used within ix:nonNumeric or ix:footnote elements"
+
+IXBRL-0011:
+  severity: error
+  source: inline_xbrl
+  spec: "Inline XBRL 1.1 §11"
+  desc: "Duplicate target document"
+  fix: "Ensure each target attribute value is unique across the document set"
+
+IXBRL-0012:
+  severity: error
+  source: inline_xbrl
+  spec: "Inline XBRL 1.1 §4"
+  desc: "Multiple ix:header elements found"
+  fix: "Ensure there is exactly one ix:header element in the document"
+
+IXBRL-0013:
+  severity: warning
+  source: inline_xbrl
+  spec: "Inline XBRL 1.1 §5"
+  desc: "Nested ix:nonFraction elements"
+  fix: "Avoid nesting ix:nonFraction elements unless required by the specification"
+
+IXBRL-0014:
+  severity: error
+  source: inline_xbrl
+  spec: "Inline XBRL 1.1 §12"
+  desc: "ix:footnote element with invalid content"
+  fix: "Ensure ix:footnote contains valid XHTML content"
+
+IXBRL-0015:
+  severity: error
+  source: inline_xbrl
+  spec: "Inline XBRL 1.1 §4"
+  desc: "Hidden element in ix:header is not allowed for this content type"
+  fix: "Move visible facts outside of the ix:hidden element"
+
+IXBRL-0016:
+  severity: warning
+  source: inline_xbrl
+  spec: "Inline XBRL 1.1 §5"
+  desc: "Scale attribute potentially incorrect"
+  fix: "Verify the scale attribute matches the intended magnitude of the reported value"
+
+IXBRL-0017:
+  severity: error
+  source: inline_xbrl
+  spec: "Inline XBRL 1.1 §5"
+  desc: "Sign attribute invalid"
+  fix: "Ensure the sign attribute is either absent or set to '-'"
+
+IXBRL-0018:
+  severity: error
+  source: inline_xbrl
+  spec: "Inline XBRL 1.1 §7"
+  desc: "Unknown transformation registry"
+  fix: "Ensure the format attribute uses a registered transformation namespace"
+
+IXBRL-0019:
+  severity: warning
+  source: inline_xbrl
+  spec: "Inline XBRL 1.1 §4"
+  desc: "Empty inline fact element"
+  fix: "Add content to the inline fact or mark it as nil"
+
+IXBRL-0020:
+  severity: error
+  source: inline_xbrl
+  spec: "XHTML 1.0"
+  desc: "Invalid XHTML in inline document"
+  fix: "Ensure the document is valid XHTML and all elements are properly nested"
+
+# ---------------------------------------------------------------------------
+# FORMULA – XBRL Formula validation
+# ---------------------------------------------------------------------------
+FORMULA-0001:
+  severity: error
+  source: formula
+  spec: "XBRL Formula 1.0 §2"
+  desc: "Formula expression evaluation error"
+  fix: "Check the XPath expression for syntax errors and valid variable references"
+
+FORMULA-0002:
+  severity: error
+  source: formula
+  spec: "XBRL Formula 1.0 §3"
+  desc: "Assertion evaluation failure"
+  fix: "Review the assertion condition and the facts it evaluates"
+
+FORMULA-0003:
+  severity: error
+  source: formula
+  spec: "XBRL Formula 1.0 §2.3"
+  desc: "Variable binding error - unresolvable variable"
+  fix: "Ensure all variable references can be resolved in the variable set"
+
+FORMULA-0004:
+  severity: error
+  source: formula
+  spec: "XBRL Formula 1.0 §2.4"
+  desc: "Filter evaluation error"
+  fix: "Check the filter expression for valid XPath syntax and references"
+
+FORMULA-0005:
+  severity: error
+  source: formula
+  spec: "XBRL Formula 1.0 §4"
+  desc: "Consistency assertion failure"
+  fix: "Review the consistency assertion and ensure the related facts are correct"
+
+FORMULA-0006:
+  severity: warning
+  source: formula
+  spec: "XBRL Formula 1.0 §2"
+  desc: "Formula produces no output"
+  fix: "Verify that the formula's variable bindings match at least one fact"
+
+# ---------------------------------------------------------------------------
+# TBL – Table linkbase validation
+# ---------------------------------------------------------------------------
+TBL-0001:
+  severity: error
+  source: table
+  spec: "XBRL Table 1.0 §2"
+  desc: "Invalid table definition"
+  fix: "Ensure the table definition has valid breakdown and axis elements"
+
+TBL-0002:
+  severity: error
+  source: table
+  spec: "XBRL Table 1.0 §3"
+  desc: "Breakdown axis resolution failure"
+  fix: "Verify the breakdown axis references valid definition nodes"
+
+TBL-0003:
+  severity: error
+  source: table
+  spec: "XBRL Table 1.0 §4"
+  desc: "Rule node evaluation error"
+  fix: "Check the rule node XPath expression and referenced concepts"
+
+TBL-0004:
+  severity: warning
+  source: table
+  spec: "XBRL Table 1.0 §2"
+  desc: "Empty table - no facts match the table layout"
+  fix: "Review the table filters and axis definitions"
+
+TBL-0005:
+  severity: error
+  source: table
+  spec: "XBRL Table 1.0 §5"
+  desc: "Aspect node conflict"
+  fix: "Ensure aspect nodes do not produce conflicting aspect values"
+
+# ---------------------------------------------------------------------------
+# LBL – Label linkbase validation
+# ---------------------------------------------------------------------------
+LBL-0001:
+  severity: error
+  source: label
+  spec: "XBRL 2.1 §5.2.2.2"
+  desc: "Label resource with missing or invalid lang attribute"
+  fix: "Add a valid xml:lang attribute to the label resource"
+
+LBL-0002:
+  severity: warning
+  source: label
+  spec: "XBRL 2.1 §5.2.2.2"
+  desc: "Duplicate label for concept/role/lang combination"
+  fix: "Remove the duplicate label or differentiate by role or language"
+
+LBL-0003:
+  severity: warning
+  source: label
+  spec: "XBRL 2.1 §5.2.2.2"
+  desc: "Concept missing standard label"
+  fix: "Add a standard label (role: label) for the concept"
+
+LBL-0004:
+  severity: error
+  source: label
+  spec: "XBRL 2.1 §5.2.2.2"
+  desc: "Label arc references non-existent locator"
+  fix: "Ensure the from/to locators referenced by the label arc exist"
+
+LBL-0005:
+  severity: warning
+  source: label
+  spec: "XBRL 2.1 §5.2.2.2"
+  desc: "Empty label content"
+  fix: "Add meaningful text content to the label resource"
+
+# ---------------------------------------------------------------------------
+# PRES – Presentation linkbase validation
+# ---------------------------------------------------------------------------
+PRES-0001:
+  severity: error
+  source: presentation
+  spec: "XBRL 2.1 §5.2.4"
+  desc: "Circular presentation hierarchy detected"
+  fix: "Remove the circular parent-child relationship in the presentation linkbase"
+
+PRES-0002:
+  severity: warning
+  source: presentation
+  spec: "XBRL 2.1 §5.2.4"
+  desc: "Duplicate presentation arc"
+  fix: "Remove the duplicate presentation arc between the same concepts"
+
+PRES-0003:
+  severity: warning
+  source: presentation
+  spec: "XBRL 2.1 §5.2.4"
+  desc: "Concept appears in multiple presentation groups without distinction"
+  fix: "Review whether the concept should appear in multiple presentation hierarchies"
+
+PRES-0004:
+  severity: error
+  source: presentation
+  spec: "XBRL 2.1 §5.2.4"
+  desc: "Presentation arc references non-existent locator"
+  fix: "Ensure from/to locators referenced by presentation arcs exist in the extended link"
+
+PRES-0005:
+  severity: warning
+  source: presentation
+  spec: "XBRL 2.1 §5.2.4"
+  desc: "Preferred label role does not exist for target concept"
+  fix: "Add the preferred label role to the target concept or change the preferredLabel attribute"
+
+# ---------------------------------------------------------------------------
+# DEF – Definition linkbase validation
+# ---------------------------------------------------------------------------
+DEF-0001:
+  severity: error
+  source: definition
+  spec: "XBRL 2.1 §5.2.6"
+  desc: "Invalid definition arc role"
+  fix: "Use a valid arcrole URI for the definition arc"
+
+DEF-0002:
+  severity: error
+  source: definition
+  spec: "XBRL 2.1 §5.2.6"
+  desc: "Circular definition hierarchy detected"
+  fix: "Remove the circular relationship in the definition linkbase"
+
+DEF-0003:
+  severity: warning
+  source: definition
+  spec: "XBRL 2.1 §5.2.6"
+  desc: "Duplicate definition arc"
+  fix: "Remove the duplicate definition arc between the same concepts"
+
+DEF-0004:
+  severity: error
+  source: definition
+  spec: "XBRL 2.1 §5.2.6"
+  desc: "Definition arc references non-existent locator"
+  fix: "Ensure from/to locators referenced by definition arcs exist in the extended link"
+
+DEF-0005:
+  severity: error
+  source: definition
+  spec: "XBRL Dimensions 1.0"
+  desc: "Invalid dimensional relationship in definition linkbase"
+  fix: "Verify the arcrole and target element are valid for dimensional relationships"
+
+# ---------------------------------------------------------------------------
+# MERGE – Multi-document / filing merge errors
+# ---------------------------------------------------------------------------
+MERGE-0001:
+  severity: error
+  source: merger
+  spec: "Inline XBRL 1.1 §11"
+  desc: "Conflicting context definitions across documents"
+  fix: "Ensure context elements with the same id have identical content across all documents"
+
+MERGE-0002:
+  severity: error
+  source: merger
+  spec: "Inline XBRL 1.1 §11"
+  desc: "Conflicting unit definitions across documents"
+  fix: "Ensure unit elements with the same id have identical content across all documents"
+
+MERGE-0003:
+  severity: error
+  source: merger
+  spec: "Inline XBRL 1.1 §11"
+  desc: "Duplicate fact id across documents"
+  fix: "Ensure fact element ids are unique across all documents in the filing"
+
+MERGE-0004:
+  severity: warning
+  source: merger
+  spec: "Inline XBRL 1.1 §11"
+  desc: "Inconsistent taxonomy references across documents"
+  fix: "Ensure all documents reference the same taxonomy entry point"
+
+MERGE-0005:
+  severity: error
+  source: merger
+  spec: "Inline XBRL 1.1 §11"
+  desc: "Target document merge failure"
+  fix: "Check for incompatible content across documents with the same target"
+
+# ---------------------------------------------------------------------------
+# EFM – SEC EDGAR Filer Manual rules
+# ---------------------------------------------------------------------------
+EFM-0001:
+  severity: error
+  source: efm
+  spec: "EFM 6.3.3"
+  desc: "Entity identifier scheme must be http://www.sec.gov/CIK"
+  fix: "Set the entity identifier scheme to http://www.sec.gov/CIK"
+
+EFM-0002:
+  severity: error
+  source: efm
+  spec: "EFM 6.5.3"
+  desc: "Context date outside acceptable range"
+  fix: "Ensure context dates fall within the required reporting period"
+
+EFM-0003:
+  severity: error
+  source: efm
+  spec: "EFM 6.5.20"
+  desc: "Monetary fact missing USD unit"
+  fix: "Ensure monetary facts reference a unit with iso4217:USD measure"
+
+EFM-0004:
+  severity: error
+  source: efm
+  spec: "EFM 6.5.17"
+  desc: "Negative value for fact that should be positive"
+  fix: "Review the sign of the reported value - use the appropriate concept for credits"
+
+EFM-0005:
+  severity: warning
+  source: efm
+  spec: "EFM 6.6.1"
+  desc: "Custom element used where standard element exists"
+  fix: "Replace the custom element with the equivalent US GAAP taxonomy element"
+
+EFM-0006:
+  severity: error
+  source: efm
+  spec: "EFM 6.5.4"
+  desc: "Required DEI fact missing"
+  fix: "Add the required Document and Entity Information fact"
+
+EFM-0007:
+  severity: error
+  source: efm
+  spec: "EFM 6.7.15"
+  desc: "Inline XBRL document exceeds size limit"
+  fix: "Split the document or reduce its size to meet EFM requirements"
+
+EFM-0008:
+  severity: warning
+  source: efm
+  spec: "EFM 6.5.25"
+  desc: "Fact value precision too low"
+  fix: "Increase the precision of the reported value"
+
+EFM-0009:
+  severity: error
+  source: efm
+  spec: "EFM 6.5.8"
+  desc: "Invalid element name format"
+  fix: "Ensure custom element names follow EFM naming conventions"
+
+EFM-0010:
+  severity: error
+  source: efm
+  spec: "EFM 6.3.6"
+  desc: "Filing contains disallowed content"
+  fix: "Remove disallowed elements or attributes from the filing"
+
+# ---------------------------------------------------------------------------
+# ESEF – European Single Electronic Format rules
+# ---------------------------------------------------------------------------
+ESEF-0001:
+  severity: error
+  source: esef
+  spec: "ESEF RTS Annex IV §1"
+  desc: "Filing must be in Inline XBRL format"
+  fix: "Convert the filing to Inline XBRL format"
+
+ESEF-0002:
+  severity: error
+  source: esef
+  spec: "ESEF RTS Annex IV §2"
+  desc: "Filing must use the ESEF taxonomy"
+  fix: "Reference the appropriate ESEF taxonomy entry point"
+
+ESEF-0003:
+  severity: error
+  source: esef
+  spec: "ESEF RTS Annex IV §4"
+  desc: "Mandatory fact not tagged"
+  fix: "Add iXBRL tagging for the required disclosure element"
+
+ESEF-0004:
+  severity: error
+  source: esef
+  spec: "ESEF RTS Annex IV §5"
+  desc: "Extension concept not anchored to ESEF taxonomy"
+  fix: "Add a wider-narrower anchoring relationship for the extension concept"
+
+ESEF-0005:
+  severity: warning
+  source: esef
+  spec: "ESEF RTS Annex IV §4"
+  desc: "Block-level tagging missing for note disclosure"
+  fix: "Add block-level iXBRL tags for the financial statement note"
+
+ESEF-0006:
+  severity: error
+  source: esef
+  spec: "ESEF RTS Annex II"
+  desc: "Filing package structure invalid"
+  fix: "Ensure the ESEF report package follows the required ZIP structure"
+
+ESEF-0007:
+  severity: error
+  source: esef
+  spec: "ESEF RTS Annex IV §3"
+  desc: "Invalid use of extension taxonomy element"
+  fix: "Review the extension element - use standard ESEF elements where possible"
+
+ESEF-0008:
+  severity: warning
+  source: esef
+  spec: "ESEF RTS Annex IV §4"
+  desc: "Fact uses non-standard unit"
+  fix: "Use ISO 4217 currency codes for monetary amounts"
+
+ESEF-0009:
+  severity: error
+  source: esef
+  spec: "ESEF RTS Annex IV §6"
+  desc: "Filing language attribute missing or invalid"
+  fix: "Add a valid xml:lang attribute matching the reporting language"
+
+ESEF-0010:
+  severity: error
+  source: esef
+  spec: "ESEF Reporting Manual §3"
+  desc: "Taxonomy package metadata invalid"
+  fix: "Ensure the taxonomy-package.xml file is valid and contains required metadata"
+
+# ---------------------------------------------------------------------------
+# XULE – XULE rule engine errors
+# ---------------------------------------------------------------------------
+XULE-0001:
+  severity: error
+  source: xule
+  spec: "XULE 1.0"
+  desc: "XULE rule syntax error"
+  fix: "Check the XULE rule file for syntax errors at the indicated line"
+
+XULE-0002:
+  severity: error
+  source: xule
+  spec: "XULE 1.0"
+  desc: "XULE rule references undefined variable"
+  fix: "Define the variable before referencing it in the rule expression"
+
+XULE-0003:
+  severity: error
+  source: xule
+  spec: "XULE 1.0"
+  desc: "XULE rule evaluation runtime error"
+  fix: "Review the rule logic for division by zero, type errors, or missing data"
+
+XULE-0004:
+  severity: warning
+  source: xule
+  spec: "XULE 1.0"
+  desc: "XULE rule produced no results"
+  fix: "Verify the rule's filter conditions match at least one fact in the instance"
+
+XULE-0005:
+  severity: error
+  source: xule
+  spec: "XULE 1.0"
+  desc: "XULE rule file not found"
+  fix: "Ensure the XULE rule file path is correct and the file exists"
+
+# ---------------------------------------------------------------------------
+# HMRC – UK HMRC iXBRL validation rules
+# ---------------------------------------------------------------------------
+HMRC-0001:
+  severity: error
+  source: hmrc
+  spec: "HMRC iXBRL Tagging Guide"
+  desc: "Required HMRC minimum tagging element missing"
+  fix: "Add the required iXBRL tag for the mandatory HMRC disclosure item"
+
+HMRC-0002:
+  severity: error
+  source: hmrc
+  spec: "HMRC iXBRL Tagging Guide"
+  desc: "Invalid taxonomy reference for HMRC filing"
+  fix: "Reference the correct HMRC-approved taxonomy version"
+
+HMRC-0003:
+  severity: warning
+  source: hmrc
+  spec: "HMRC iXBRL Tagging Guide"
+  desc: "Recommended HMRC tagging element missing"
+  fix: "Consider adding the recommended iXBRL tag for improved filing quality"
+
+HMRC-0004:
+  severity: error
+  source: hmrc
+  spec: "HMRC iXBRL Tagging Guide"
+  desc: "HMRC entity identifier format invalid"
+  fix: "Use the correct entity identifier scheme and format for HMRC filings"
+
+HMRC-0005:
+  severity: error
+  source: hmrc
+  spec: "HMRC iXBRL Tagging Guide"
+  desc: "HMRC required period context missing"
+  fix: "Add context elements for the required HMRC reporting periods"
+
+# ---------------------------------------------------------------------------
+# CIPC – South Africa CIPC XBRL validation rules
+# ---------------------------------------------------------------------------
+CIPC-0001:
+  severity: error
+  source: cipc
+  spec: "CIPC XBRL Filing Rules"
+  desc: "Required CIPC taxonomy element missing"
+  fix: "Add the required element from the CIPC taxonomy"
+
+CIPC-0002:
+  severity: error
+  source: cipc
+  spec: "CIPC XBRL Filing Rules"
+  desc: "Invalid CIPC taxonomy version referenced"
+  fix: "Reference the current CIPC-approved taxonomy version"
+
+CIPC-0003:
+  severity: warning
+  source: cipc
+  spec: "CIPC XBRL Filing Rules"
+  desc: "CIPC recommended disclosure missing"
+  fix: "Consider adding the recommended CIPC disclosure element"
+
+CIPC-0004:
+  severity: error
+  source: cipc
+  spec: "CIPC XBRL Filing Rules"
+  desc: "CIPC entity registration number format invalid"
+  fix: "Ensure the entity identifier matches the CIPC registration number format"
+
+CIPC-0005:
+  severity: error
+  source: cipc
+  spec: "CIPC XBRL Filing Rules"
+  desc: "CIPC financial period context invalid"
+  fix: "Ensure context periods align with CIPC reporting requirements"
+
+# ---------------------------------------------------------------------------
+# MCA – India MCA XBRL validation rules
+# ---------------------------------------------------------------------------
+MCA-0001:
+  severity: error
+  source: mca
+  spec: "MCA XBRL Filing Rules"
+  desc: "Required MCA taxonomy element missing"
+  fix: "Add the required element from the MCA Indian taxonomy"
+
+MCA-0002:
+  severity: error
+  source: mca
+  spec: "MCA XBRL Filing Rules"
+  desc: "Invalid MCA taxonomy version referenced"
+  fix: "Reference the current MCA-approved taxonomy version"
+
+MCA-0003:
+  severity: warning
+  source: mca
+  spec: "MCA XBRL Filing Rules"
+  desc: "MCA recommended disclosure missing"
+  fix: "Consider adding the recommended MCA disclosure element"
+
+MCA-0004:
+  severity: error
+  source: mca
+  spec: "MCA XBRL Filing Rules"
+  desc: "MCA CIN (Corporate Identity Number) format invalid"
+  fix: "Ensure the entity identifier matches the MCA CIN format"
+
+MCA-0005:
+  severity: error
+  source: mca
+  spec: "MCA XBRL Filing Rules"
+  desc: "MCA financial year context invalid"
+  fix: "Ensure context periods align with the Indian financial year requirements"
+
+# ---------------------------------------------------------------------------
+# AI – AI-powered analysis findings
+# ---------------------------------------------------------------------------
+AI-0001:
+  severity: info
+  source: ai
+  spec: "AI Analysis"
+  desc: "AI-suggested potential data quality issue"
+  fix: "Review the flagged value - AI analysis suggests it may be anomalous"
+
+AI-0002:
+  severity: info
+  source: ai
+  spec: "AI Analysis"
+  desc: "AI-detected unusual year-over-year change"
+  fix: "Verify the significant change in value compared to prior periods"
+
+AI-0003:
+  severity: info
+  source: ai
+  spec: "AI Analysis"
+  desc: "AI-detected potential concept misuse"
+  fix: "Review whether the selected taxonomy concept is the best match for this disclosure"
+
+AI-0004:
+  severity: info
+  source: ai
+  spec: "AI Analysis"
+  desc: "AI-detected potential unit mismatch"
+  fix: "Verify the unit is appropriate for the reported concept"
+
+AI-0005:
+  severity: info
+  source: ai
+  spec: "AI Analysis"
+  desc: "AI-detected narrative inconsistency"
+  fix: "Review the tagged text for consistency with the reported numeric values"
+
+AI-0006:
+  severity: info
+  source: ai
+  spec: "AI Analysis"
+  desc: "AI-suggested improved taxonomy element"
+  fix: "Consider using the suggested standard taxonomy element instead of a custom extension"
+
+AI-0007:
+  severity: info
+  source: ai
+  spec: "AI Analysis"
+  desc: "AI-detected peer comparison outlier"
+  fix: "Verify the reported value - it differs significantly from industry peers"
+
+AI-0008:
+  severity: info
+  source: ai
+  spec: "AI Analysis"
+  desc: "AI-detected temporal pattern anomaly"
+  fix: "Review the trend across reporting periods for potential data entry errors"
+
+AI-0009:
+  severity: info
+  source: ai
+  spec: "AI Analysis"
+  desc: "AI-detected cross-statement inconsistency"
+  fix: "Verify consistency between related values across financial statements"
+
+AI-0010:
+  severity: info
+  source: ai
+  spec: "AI Analysis"
+  desc: "AI analysis confidence too low to classify"
+  fix: "Manual review recommended - AI confidence below threshold for this finding"
