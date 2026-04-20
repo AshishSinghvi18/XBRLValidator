@@ -128,9 +128,12 @@ def iter_with_cleanup(context: Any) -> Generator[etree._Element, None, None]:
     """
     for _event, element in context:
         yield element
-        # Release element memory
+        # element.clear() releases the element's children and text,
+        # but lxml still holds a back-reference from the parent.
+        # parent.remove() drops that reference so the element (and
+        # its subtree) can be garbage-collected immediately, keeping
+        # memory usage O(1) regardless of document size.
         element.clear()
-        # Also release references to the element's parent
         parent = element.getparent()
         if parent is not None:
             parent.remove(element)
