@@ -68,9 +68,24 @@ def validate(
 
     # 5. Apply strict mode — promote warnings to errors
     if strict:
+        from src.core.model.instance import ValidationMessage as VM
+
+        promoted: list[VM] = []
         for msg in messages:
             if msg.severity == Severity.WARNING:
-                msg.severity = Severity.ERROR
+                promoted.append(VM(
+                    code=msg.code,
+                    severity=Severity.ERROR,
+                    message=msg.message,
+                    spec_ref=msg.spec_ref,
+                    file_path=msg.file_path,
+                    line=msg.line,
+                    column=msg.column,
+                    fix_suggestion=msg.fix_suggestion,
+                ))
+            else:
+                promoted.append(msg)
+        messages = promoted
 
     # 6. Apply max_errors limit
     if max_errors > 0:

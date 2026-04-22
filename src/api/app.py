@@ -61,10 +61,16 @@ async def validate_file(
     if not content:
         raise HTTPException(status_code=400, detail="Empty file")
 
-    # Write to a temporary location within the working directory for parsing
+    # Write to a working location for parsing, sanitizing the filename
+    import uuid
+
     work_dir = Path(".xbrl_api_work")
     work_dir.mkdir(exist_ok=True)
-    temp_path = work_dir / file.filename
+    safe_name = Path(file.filename).name  # strip directory components
+    safe_name = safe_name.replace("..", "_").lstrip(".")
+    if not safe_name:
+        safe_name = "upload"
+    temp_path = work_dir / f"{uuid.uuid4().hex}_{safe_name}"
     try:
         temp_path.write_bytes(content)
         result = _validate_file(temp_path, file.filename, regulator)

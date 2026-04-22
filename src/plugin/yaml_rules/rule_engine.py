@@ -7,6 +7,8 @@ XBRL instances to produce validation messages.
 from __future__ import annotations
 
 import logging
+import operator
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -231,9 +233,6 @@ class YAMLRuleEngine:
         condition: str,
     ) -> list[str]:
         """Evaluate fact_count comparison conditions."""
-        import operator
-        import re
-
         ops: dict[str, Any] = {
             "==": operator.eq,
             "!=": operator.ne,
