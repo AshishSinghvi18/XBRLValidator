@@ -1,0 +1,21 @@
+version: "3.9"
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - taxonomy-cache:/var/cache/xbrl
+      - ./data:/app/data
+    environment:
+      - XBRL_MEMORY_BUDGET_GB=4
+      - XBRL_TAXONOMY_CACHE_DIR=/var/cache/xbrl
+      - XBRL_DATABASE_URL=sqlite:///app/data/xbrl_validator.db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/v1/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  taxonomy-cache:
