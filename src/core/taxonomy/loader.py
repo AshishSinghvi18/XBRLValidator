@@ -21,6 +21,7 @@ from lxml import etree
 from src.core.constants import (
     NS_LINK,
     NS_XBRLDT,
+    NS_XBRLI,
     NS_XLINK,
     NS_XSD,
 )
@@ -216,7 +217,10 @@ class TaxonomyLoader:
 
             qname = format_qname(target_ns, name)
 
-            # Determine concept type from substitution group
+            # Determine concept type from substitution group.
+            # The substitutionGroup attribute may be a prefixed QName
+            # (e.g. "xbrli:item") — extract the local name for lookup
+            # against our known substitution groups.
             subst_local = subst_group.split(":")[-1] if ":" in subst_group else subst_group
             concept_type = _SUBST_GROUP_MAP.get(subst_local, ConceptType.ITEM)
 
@@ -230,23 +234,19 @@ class TaxonomyLoader:
             if abstract and concept_type == ConceptType.ITEM:
                 concept_type = ConceptType.ABSTRACT
 
-            # Period type (xbrli:periodType)
+            # Period type — xbrli:periodType (XBRL 2.1 §5.1.1)
             period_type_str = elem.get(
-                f"{{{NS_XBRLDT}}}periodType",
+                f"{{{NS_XBRLI}}}periodType",
                 elem.get("periodType", ""),
             )
-            # Also check xbrli namespace attribute
-            xbrli_ns = "http://www.xbrl.org/2003/instance"
-            if not period_type_str:
-                period_type_str = elem.get(f"{{{xbrli_ns}}}periodType", "")
             try:
                 period_type = PeriodType(period_type_str) if period_type_str else PeriodType.DURATION
             except ValueError:
                 period_type = PeriodType.DURATION
 
-            # Balance type (xbrli:balance)
+            # Balance type — xbrli:balance (XBRL 2.1 §5.1.1)
             balance_str = elem.get(
-                f"{{{xbrli_ns}}}balance",
+                f"{{{NS_XBRLI}}}balance",
                 elem.get("balance", ""),
             )
             try:
